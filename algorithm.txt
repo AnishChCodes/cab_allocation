@@ -1,0 +1,44 @@
+## Algorithm for find_and_assign_driver function
+
+This function iterates through a list of drivers and tries to find the most suitable one for a given ride request. Here's a breakdown of the steps:
+
+1. Initialization:
+    - Set `driver_pickup_cost`, `ride_cost`, and `assigned_driver` to `None`. These variables will store the cost details and the chosen driver.
+
+2. Iterate through drivers:
+    - Loop through each driver in the `driver_list`.
+
+3. Check driver availability:
+    - Use `driver.driver_available(ride.pickup_location, ride.pickup_time)` to check if the driver is available to pick up
+    the rider at the requested location and time.
+
+4. Calculate costs:
+    - If the driver is available, calculate:
+        - `temp_driver_pickup_cost`: Cost for the driver to reach the pickup location (using `driver.calculate_pickup_cost(ride.pickup_location)`).
+        - `temp_ride_cost`: Total cost of the ride for the rider (using `ride.displacement * driver.driver_price`).
+
+5. Find the best driver:
+    - There are two cases to consider:
+        - If no driver has been assigned yet (i.e., `assigned_driver` is `None`):
+            - Set `driver_pickup_cost`, `ride_cost`, and `assigned_driver` to the current driver's calculated costs and information.
+        - If another driver is already assigned:
+            - Only consider the current driver if both:
+                - `temp_driver_pickup_cost` is less than or equal to `driver_pickup_cost` (cheaper or same cost to reach pickup).
+                - `temp_ride_cost` is less than or equal to `ride_cost` (cheaper or same total cost for the ride).
+            - If both conditions are met, update `driver_pickup_cost`, `ride_cost`, and `assigned_driver` with the current driver's details.
+
+6. Assign the ride (if driver found):
+    - If a suitable driver was found (`assigned_driver` is not `None`):
+        - Call `ride.assign_driver(assigned_driver)` to assign the driver to the ride on the rider's side.
+        - Call `assigned_driver.assign_ride(ride)` to assign the ride to the driver on the driver's side.
+        - Update the driver's expected next availability time (`expected_next_availability`) to the ride's drop-off time.
+        - Update the driver's expected next location (`expected_next_location`) to the ride's drop-off location.
+        - Add a record of the driver-ride pairing to the `rides_driver_mapping` list.
+
+## Summary
+
+This function finds the most suitable driver for a ride request by considering both the driver's pickup cost and the total ride
+cost for the rider. It prioritizes drivers who can reach the pickup location cheaper or with the same cost as the previously
+considered driver, while also ensuring the total ride cost remains optimal or the same for the rider.
+
+
